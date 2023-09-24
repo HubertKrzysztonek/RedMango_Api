@@ -1,20 +1,46 @@
-﻿namespace RedMango_Api.Services
+﻿using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+
+namespace RedMango_Api.Services
 {
     public class BlobService : IBlobService
     {
-        public Task<string> DeleteBlob(string blobname, string containerName)
+        private readonly BlobServiceClient _blobCient;
+
+        public BlobService(BlobServiceClient blobClient)
         {
-            throw new NotImplementedException();
+            _blobCient = blobClient;
         }
 
-        public Task<string> GetBlob(string blobname, string containerName)
+        public async Task<bool> DeleteBlob(string blobname, string containerName)
         {
-            throw new NotImplementedException();
+            BlobContainerClient blobContainerClient = _blobCient.GetBlobContainerClient(containerName);
+            BlobClient blobClient = blobContainerClient.GetBlobClient(blobname);
+
+            return await blobClient.DeleteIfExistsAsync();
         }
 
-        public Task<string> UploadBlob(string blobname, string containerName, IFormFile file)
+        public async Task<string> GetBlob(string blobname, string containerName)
         {
-            throw new NotImplementedException();
+            BlobContainerClient blobContainerClient = _blobCient.GetBlobContainerClient(containerName);
+            BlobClient blobClient = blobContainerClient.GetBlobClient(blobname);
+            return blobClient.Uri.AbsoluteUri;
+        }
+
+        public async Task<string> UploadBlob(string blobname, string containerName, IFormFile file)
+        {
+            BlobContainerClient blobContainerClient = _blobCient.GetBlobContainerClient(containerName);
+            BlobClient blobClient = blobContainerClient.GetBlobClient(blobname);
+            var httpHeaders = new BlobHttpHeaders()
+            {
+                ContentType = file.ContentType
+            };
+            var result = await blobClient.UploadAsync(file.OpenReadStream(), httpHeaders);
+            if (result != null)
+            {
+                return await GetBlob(blobname, containerName);
+            }
+            return "";
         }
     }
 }
