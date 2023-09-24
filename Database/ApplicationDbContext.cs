@@ -12,5 +12,6 @@ namespace RedMango_Api.Database
         }
 
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+        public DbSet<MenuItem> MenuItems { get; set; }
     }
 }
