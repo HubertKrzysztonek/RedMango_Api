@@ -25,5 +25,24 @@ namespace RedMango_Api.Controllers
             _response.StatusCode = HttpStatusCode.OK;
             return Ok(_response);
         }
+        
+        [HttpGet("int:id")]
+        public async Task<IActionResult> GetMenuItem(int id)
+        {
+            if (id == 0)
+            {
+                _response.StatusCode = HttpStatusCode.BadRequest;
+                return BadRequest(_response);
+            }
+            MenuItem menuItem = _dbcontext.MenuItems.FirstOrDefault(i => i.Id == id);
+            if (menuItem == null)
+            {
+                _response.StatusCode=HttpStatusCode.NotFound;
+                return NotFound(_response);
+            }
+            _response.StatusCode = HttpStatusCode.OK;
+            _response.Result = menuItem;
+            return Ok(_response);
+        }
     }
 }

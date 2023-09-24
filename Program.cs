@@ -1,8 +1,10 @@
 
+using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using RedMango_Api.Database;
 using RedMango_Api.Models;
+using RedMango_Api.Services;
 
 namespace RedMango_Api
 {
@@ -17,7 +19,9 @@ namespace RedMango_Api
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultDbConnection"));
             });
+            builder.Services.AddSingleton(u => new BlobServiceClient(builder.Configuration.GetConnectionString("StorageAccount")));
             builder.Services.AddIdentity<ApplicationUser,IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
+            builder.Services.AddSingleton<IBlobService, BlobService>();
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
